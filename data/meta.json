@@ -1,0 +1,19 @@
+{
+ "team": "Two Degrees",
+ "members": [
+  "Evelyn Na",
+  "Asha Diekmann",
+  "Eric Nguyen",
+  "Raymond Wang"
+ ],
+ "title": "When Will Your Part of the World Cross 2\u00b0C?",
+ "primary": "ssp245",
+ "end_window": [
+  2081,
+  2100
+ ],
+ "baseline": [
+  1850,
+  1900
+ ]
+}

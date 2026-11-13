@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crossing 2°C</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>When will your part of the world cross 2°C?</h1>
+    <p id="subtitle" class="muted">Local warming from CMIP6 climate models.</p>
+  </header>
+
+  <section class="controls" aria-label="Controls">
+    <div class="control"><span class="label">Warming level</span><div id="thresholds" class="segmented" role="group" aria-label="Warming level"></div></div>
+    <div class="control"><span class="label">Emissions scenario</span><div id="scenarios" class="segmented" role="group" aria-label="Emissions scenario"></div></div>
+    <div class="control"><label class="label" for="place">Place</label><select id="place"></select></div>
+  </section>
+
+  <p id="headline" class="headline" aria-live="polite"></p>
+
+  <section class="layout">
+    <figure class="map-wrap">
+      <canvas id="map" aria-label="World map of the year each place crosses the selected warming level"></canvas>
+      <div id="legend"></div>
+      <figcaption class="muted">Hover for details. Click anywhere to select that place.</figcaption>
+    </figure>
+    <figure class="panel">
+      <h2 id="rangeTitle"></h2>
+      <p class="muted small0">Dots are the model median. Bars run from the earliest to the latest model.</p>
+      <svg id="range"></svg>
+    </figure>
+  </section>
+
+  <section class="panel wide">
+    <h2 id="lineTitle"></h2>
+    <svg id="line"></svg>
+  </section>
+
+  <p id="method" class="muted small"></p>
+
+  <section class="writeup" aria-labelledby="writeupTitle">
+    <h2 id="writeupTitle">Writeup</h2>
+
+    <h3>Motivation</h3>
+
+    <p>Climate change is often discussed in terms of global targets like 1.5°C or 2°C, but people experience warming where they live. We wanted to connect those numbers to a more personal question: when is a particular place projected to reach 1.5°C, 2°C, or 3°C of warming relative to its own preindustrial average?</p>
+
+    <p>We initially considered looking at where warming would be strongest and also discussed a question about precipitation. We eventually chose to focus on crossing years because timing felt easier to relate to. A year gives readers something concrete to think about, whether they are looking at their hometown or comparing places around the world.</p>
+
+    <h3>Design Rationale</h3>
+
+    <h4>Map</h4>
+
+    <p>The map gives readers an overview of when different places reach the selected warming level. Each grid cell is colored by its median crossing year across the models. We used a sequential scale, with dark red for earlier crossings and progressively paler shades for later ones. The darker colors draw attention to places reaching the threshold sooner.</p>
+
+    <p>We kept the color scale fixed at 2000–2090 across all scenarios and warming levels, so the colors keep the same meaning when readers switch between views. The left end of the legend is labeled “≤2000,” grouping places that crossed the threshold from 1970 through 2000 in the darkest shade of red. Gray means the threshold is not reached by about 2090, the end of our reporting period. We kept it separate from the color scale so readers would not mistake it for a particularly late crossing year. We also chose the Equal Earth projection because it preserves relative areas and avoids making polar regions look disproportionately large.</p>
+
+    <h4>Supporting charts</h4>
+
+    <p>The side panel shows all four scenarios for the selected place. We used blue, green, yellow, and red to make the four scenarios easy to tell apart. A dot marks the median crossing year, while a bar spans the earliest to latest crossing years across the models. Showing the range alongside the median gives readers a sense of how much the models agree, instead of making one year look more certain than it is.</p>
+
+    <p>The line chart below the map compares warming at the selected place with the global mean using decade averages. Red highlights the selected place, while black provides a neutral reference for the global mean. A dashed horizontal line marks the selected warming threshold, and a vertical line marks the crossing year calculated from the 20-year averages. This adds context to the map by showing how the place warms over time and how its trajectory compares with the world as a whole.</p>
+
+    <h4>Data transformations</h4>
+
+    <p>We used monthly near-surface air temperature data, called <code>tas</code>, from eight CMIP6 models. For each model, we included a historical run and four SSP scenarios, using one ensemble member per model. We converted the monthly values to annual means and regridded the data to a shared 2.5° grid so we could combine results across models.</p>
+
+    <p>Because models differ in their absolute temperatures, we measured warming relative to each model’s own 1850–1900 average at each location. We then used 20-year averages to reduce year-to-year variability. The reported crossing year is the center of the first window that reaches the threshold, which means about 2090 is the latest year we can report.</p>
+
+    <p>We only counted crossings from 1970 onward. Some models showed earlier local fluctuations that appeared to reflect natural variability, and we wanted to avoid treating those as the warming trend we were trying to show. We summarized crossing years using the median across models to reduce the influence of an unusually early or late result. Models that did not reach the threshold within the available data were retained and treated as crossing later than any reported year.</p>
+
+    <h4>Interactions</h4>
+
+    <p>The warming-level buttons let readers compare when a place reaches 1.5°C, 2°C, and 3°C. The scenario buttons show how those dates change under different emissions pathways. Readers can choose a place from the dropdown or click directly on the map to explore somewhere familiar and compare it with the global mean. Hovering over a grid cell shows its crossing year and how many models reach the selected threshold, giving readers more detail without crowding the map.</p>
+
+    <h4>Alternatives and limitations</h4>
+
+    <p>An early version built by a teammate used only MPI-ESM1-2-LR. In that version, Chicago crossed 2°C earlier under SSP2-4.5 than under SSP5-8.5. This made us more cautious about relying on a single model, since local crossing years can be sensitive to variability. We moved to a median across multiple models and added the range so readers could see the spread in their estimates.</p>
+
+    <p>The visualization still has limits. A 2.5° grid cell covers a much larger area than an individual city, so city selections should be understood as regional estimates. Our eight models are also only a sample of the full CMIP6 ensemble. The range shows differences within that sample and does not capture every source of uncertainty.</p>
+
+    <h3>Development Process</h3>
+
+    <p>Evelyn worked on building the D3 visualization, coding, and the video. Asha, Eric, and Raymond focused on exploratory charts and data processing. We all contributed to the writeup and discussed the design decisions together.</p>
+
+    <p>We met twice a week, and each team member spent roughly three to four hours working independently outside our meetings. Understanding the data structure was the most time-consuming part at the beginning. We spent a lot of time figuring out how the data was organized before we could use it confidently in our analysis.</p>
+
+    <p>Choosing how to present the results also took a lot of discussion. We spent much of our meeting time comparing chart ideas and deciding which ones would make the patterns easiest to understand. Those conversations helped us settle on the map, the scenario range chart, and the line chart comparing local and global warming as the main parts of the visualization.</p>
+  </section>
+  <div id="tooltip" role="status" hidden></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
